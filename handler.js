@@ -43,8 +43,18 @@ module.exports.suma = async (data) => {
 
 module.exports.multiplicacion = async (data) => {
   const { sumados } = data;
-  const ramdom = await invokeLambda(process.env.ARN_RAMDON_FUNCTION, '20');
-  console.log('multiplicado >> ramdom', ramdom);
-  const result = sumados * 5;
-  return result;
+  const { Payload } = await invokeLambda(process.env.ARN_RAMDON_FUNCTION, {
+    pathParameters: { number: 20 },
+  });
+
+  console.log('multiplicado >> Payload', Payload, typeof Payload);
+
+  // const newPayload = JSON.parse(Payload);
+  // console.log('multiplicado >> newPayload', newPayload, typeof newPayload);
+  const { statusCode, body } = JSON.parse(Payload);
+  const { result } = JSON.parse(body);
+  console.log('multiplicado >> ramdom', result);
+
+  const total = sumados * result;
+  return total;
 };

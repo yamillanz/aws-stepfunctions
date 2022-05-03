@@ -24,16 +24,16 @@ provider:
           - 'stateMachine'
           - '${self:stepFunctions.stateMachines.poc-invoke-calculator.name}'
     DOMAIN_NAME: 'e1-payment-gateway.backendnaranja.com'
-    ARN_RAMDON_FUNCTION: 'arn:aws:lambda:us-east-1:826652489764:function:poc-invokenan-sf-random'
+    ARN_RAMDON_FUNCTION: 'arn:aws:lambda:us-east-1:585597747501:function:poc-invokenan-lambdacal-dev-calculateRandom'
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - lambda:InvokeFunction
-            - lambda:InvokeAsync
-          Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
+  # iam:
+  #   role:
+  #     statements:
+  #       - Effect: Allow
+  #         Action:
+  #           - lambda:InvokeFunction
+  #           - lambda:InvokeAsync
+  #         Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
 
 custom:
   customDomain:
@@ -60,12 +60,12 @@ functions:
 
   multiplicacion:
     handler: handler.multiplicacion
-    # iamRoleStatements:
-    #   - Effect: Allow
-    #     Action:
-    #       - lambda:InvokeFunction
-    #       - lambda:InvokeAsync
-    #     Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - lambda:InvokeFunction
+          - lambda:InvokeAsync
+        Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
 
 # ApiGatewayInvokeLambdaPermission:
 #   Type: 'AWS::Lambda::Permission'
@@ -76,30 +76,30 @@ functions:
 #     Principal: apigateway.amazonaws.com
 #     SourceArn: ${self:provider.environment.ARN_RAMDON_FUNCTION}
 
-resources:
-  Resources:
-    APILambdaInvokeRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - 'apigateway.amazonaws.com'
-              Action:
-                - 'sts:AssumeRole'
-    APILambdaInvokePolicy:
-      Type: AWS::IAM::Policy
-      Properties:
-        PolicyName: LambdaInvokePolicy
-        PolicyDocument:
-          Statement:
-            - Effect: Allow
-              Action: 'lambda:InvokeFunction'
-              Resource: '*'
-        Roles:
-          - !Ref APILambdaInvokeRole
+# resources:
+#   Resources:
+#     APILambdaInvokeRole:
+#       Type: AWS::IAM::Role
+#       Properties:
+#         AssumeRolePolicyDocument:
+#           Statement:
+#             - Effect: Allow
+#               Principal:
+#                 Service:
+#                   - 'apigateway.amazonaws.com'
+#               Action:
+#                 - 'sts:AssumeRole'
+#     APILambdaInvokePolicy:
+#       Type: AWS::IAM::Policy
+#       Properties:
+#         PolicyName: LambdaInvokePolicy
+#         PolicyDocument:
+#           Statement:
+#             - Effect: Allow
+#               Action: 'lambda:InvokeFunction'
+#               Resource: '*'
+#         Roles:
+#           - !Ref APILambdaInvokeRole
 
 stepFunctions:
   stateMachines:
