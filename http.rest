@@ -1,0 +1,7 @@
+POST https://e1-payment-gateway.backendnaranja.com/poc-calculator/maths HTTP/1.1
+Content-Type: application/json
+
+{
+    "x": 23,
+    "y": 54
+}

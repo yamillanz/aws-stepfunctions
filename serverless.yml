@@ -1,0 +1,126 @@
+service: poc-invokenan-sf
+frameworkVersion:
+  '3'
+  #Async Step Function
+  #   - Effect: Allow
+  #     Action:
+  #       - states:StartSyncExecution
+  #     Resource: '*'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-east-1
+  environment:
+    SF_NAME:
+      Fn::Join:
+        - ':'
+        - - 'arn'
+          - 'aws'
+          - 'states'
+          - '${aws:region}'
+          - '${aws:accountId}'
+          - 'stateMachine'
+          - '${self:stepFunctions.stateMachines.poc-invoke-calculator.name}'
+    DOMAIN_NAME: 'e1-payment-gateway.backendnaranja.com'
+    ARN_RAMDON_FUNCTION: 'arn:aws:lambda:us-east-1:826652489764:function:poc-invokenan-sf-random'
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+          Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
+
+custom:
+  customDomain:
+    domainName: ${self:provider.environment.DOMAIN_NAME}
+    basePath: poc-calculator
+    stage: ${self:provider.stage}
+
+functions:
+  startSFMaths:
+    handler: handler.startSFMaths
+    events:
+      - http:
+          path: /maths
+          method: POST
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - states:StartSyncExecution
+        Resource: '*'
+
+  suma:
+    handler: handler.suma
+
+  multiplicacion:
+    handler: handler.multiplicacion
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - lambda:InvokeFunction
+    #       - lambda:InvokeAsync
+    #     Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
+
+# ApiGatewayInvokeLambdaPermission:
+#   Type: 'AWS::Lambda::Permission'
+#   Properties:
+#     Action: lambda:InvokeFunction
+#     FunctionName:
+#       Fn::GetAtt: [multiplicacion, Arn]
+#     Principal: apigateway.amazonaws.com
+#     SourceArn: ${self:provider.environment.ARN_RAMDON_FUNCTION}
+
+resources:
+  Resources:
+    APILambdaInvokeRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - 'apigateway.amazonaws.com'
+              Action:
+                - 'sts:AssumeRole'
+    APILambdaInvokePolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: LambdaInvokePolicy
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Action: 'lambda:InvokeFunction'
+              Resource: '*'
+        Roles:
+          - !Ref APILambdaInvokeRole
+
+stepFunctions:
+  stateMachines:
+    poc-invoke-calculator:
+      name: poc-invoke-calculator
+      type: EXPRESS
+      definition:
+        StartAt: suma
+        States:
+          suma:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [suma, Arn]
+            Next: multiplicacion
+          multiplicacion:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [multiplicacion, Arn]
+            End: true
+
+plugins:
+  - serverless-step-functions
+  - serverless-domain-manager
+  - serverless-iam-roles-per-function
