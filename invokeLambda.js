@@ -1,12 +1,7 @@
 const AWS = require('aws-sdk');
 const lambda = new AWS.Lambda();
 
-//
-// Expected use:
-//
-//   (payload can be an object or a JSON string, for example)
-//   let var = await invokeLambda(lambdaFunctionName, payload);
-//
+
 const invokeLambda = async (lambdaFunctionName, payload = '') => {
   console.log('>>> Entering invokeLambda');
 

@@ -26,15 +26,6 @@ provider:
     DOMAIN_NAME: 'e1-payment-gateway.backendnaranja.com'
     ARN_RAMDON_FUNCTION: 'arn:aws:lambda:us-east-1:585597747501:function:poc-invokenan-lambdacal-dev-calculateRandom'
 
-  # iam:
-  #   role:
-  #     statements:
-  #       - Effect: Allow
-  #         Action:
-  #           - lambda:InvokeFunction
-  #           - lambda:InvokeAsync
-  #         Resource: ${self:provider.environment.ARN_RAMDON_FUNCTION}
-
 custom:
   customDomain:
     domainName: ${self:provider.environment.DOMAIN_NAME}
