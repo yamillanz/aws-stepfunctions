@@ -10,8 +10,8 @@ frameworkVersion:
 provider:
   name: aws
   runtime: nodejs14.x
-  stage: dev
-  region: us-east-1
+  region: ${env:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
   environment:
     SF_NAME:
       Fn::Join:
